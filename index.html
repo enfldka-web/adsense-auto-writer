@@ -429,7 +429,7 @@ async function apiCall(sys,userMsg,btn,loadingText,maxR=3,useTagFormat=true,useW
       if(i>1){showErr(`재시도 ${i}/${maxR}...`);btn.innerHTML=`<span class="spinner"></span> 재시도 ${i}/${maxR}...`;await new Promise(r=>setTimeout(r,i*8000));hideErr();}
       btn.innerHTML=`<span class="spinner"></span> ${loadingText}`;
       const body={model:S.model,max_tokens:16000,system:sys,messages:[{role:'user',content:userMsg}]};
-      if(useWebSearch){body.tools=[{type:'web_search_20250305',name:'web_search',max_uses:3}];}
+      if(useWebSearch){body.tools=[{type:'web_search_20250305',name:'web_search',max_uses:3}];body.tool_choice={type:'tool',name:'web_search'};}
       const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
       const data=await res.json();
       if(data.error){if((data.error.type==='overloaded_error'||res.status===529)&&i<maxR)continue;throw new Error(data.error.type==='overloaded_error'?'서버 과부하. 잠시 후 재시도.':data.error.message);}
