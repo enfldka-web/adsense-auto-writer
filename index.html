@@ -214,7 +214,7 @@ button{-webkit-tap-highlight-color:transparent}
 </div>
 <div class="toast" id="toast">✓ 클립보드에 복사되었습니다</div>
 <script>
-const S={cat:'life',tone:'friendly',len:'medium',model:'claude-haiku-4-5-20251001',key:'',history:[],result:null,selectedTitle:'',lastRaw:'',mode:'topic',selectedKeyword:''};
+const S={cat:'life',tone:'friendly',len:'medium',model:'claude-sonnet-4-20250514',key:'',history:[],result:null,selectedTitle:'',lastRaw:'',mode:'topic',selectedKeyword:''};
 const CATS=[{id:'life',l:'일상/라이프',i:'☕'},{id:'tech',l:'IT/테크',i:'💻'},{id:'health',l:'건강/운동',i:'💪'},{id:'finance',l:'재테크/경제',i:'💰'},{id:'food',l:'맛집/요리',i:'🍳'},{id:'travel',l:'여행',i:'✈️'},{id:'edu',l:'교육/자기계발',i:'📚'},{id:'review',l:'제품리뷰',i:'🔍'},{id:'enter',l:'엔터/영화/드라마',i:'🎬'},{id:'parenting',l:'육아/결혼',i:'👶'},{id:'interior',l:'인테리어/살림',i:'🏠'},{id:'pet',l:'반려동물',i:'🐶'},{id:'career',l:'취업/이직',i:'💼'}];
 const TONES=[{id:'friendly',l:'친근한 말투'},{id:'professional',l:'전문적 말투'},{id:'casual',l:'캐주얼 말투'}];
 const LENS=[{id:'short',l:'1500자',w:1500},{id:'medium',l:'2500자',w:2500},{id:'long',l:'4000자+',w:4000}];
@@ -429,7 +429,7 @@ async function apiCall(sys,userMsg,btn,loadingText,maxR=3,useTagFormat=true,useW
       if(i>1){showErr(`재시도 ${i}/${maxR}...`);btn.innerHTML=`<span class="spinner"></span> 재시도 ${i}/${maxR}...`;await new Promise(r=>setTimeout(r,i*8000));hideErr();}
       btn.innerHTML=`<span class="spinner"></span> ${loadingText}`;
       const body={model:S.model,max_tokens:16000,system:sys,messages:[{role:'user',content:userMsg}]};
-      if(useWebSearch){body.tools=[{type:'web_search_20250305',name:'web_search',max_uses:3}];body.tool_choice={type:'tool',name:'web_search'};}
+      if(useWebSearch){body.tools=[{type:'web_search_20250305',name:'web_search',max_uses:6}];body.tool_choice={type:'tool',name:'web_search'};}
       const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
       const data=await res.json();
       if(data.error){if((data.error.type==='overloaded_error'||res.status===529)&&i<maxR)continue;throw new Error(data.error.type==='overloaded_error'?'서버 과부하. 잠시 후 재시도.':data.error.message);}
@@ -763,6 +763,7 @@ ${sc.id==='life'?`[일상/라이프 카테고리]
 - web_search 결과에 정확한 수치가 없는데 그럴듯한 숫자를 만들어내는 것 절대 금지 (예: 검색 결과가 "1시간 기준"인데 "30분 기준"으로 바꿔 쓰기, "6주 연구"를 "1년 연구"로 부풀리기 등 왜곡도 금지)
 - 확실한 수치를 못 찾았으면 숫자 대신 "적지 않은", "상당수", "짧은 시간 안에" 같은 정성적 표현을 사용할 것
 - 설문/연구 결과를 인용할 때는 그 결과가 무엇에 대한 1위/순위인지 검색 결과 그대로 정확히 인용 (다른 항목과 순서를 섞거나 비교 기준을 바꾸지 말 것)
+- 같은 수치에 대해 검색 결과 출처마다 서로 다른 값이 나오면(예: 한 곳은 105원, 다른 곳은 120원), 둘 중 하나를 임의로 골라 쓰지 말고 그 수치 자체를 빼거나 "정확한 수치는 공식 사이트에서 확인하세요" 식으로 안내할 것
 
 4. 시각적 요소 (스타일 B — 블록 강조형):
 - HTML 속성에는 반드시 작은따옴표(') 사용 (파싱 오류 방지)
